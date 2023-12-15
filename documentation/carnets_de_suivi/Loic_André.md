@@ -1,0 +1,18 @@
+*******************
+# Compte rendu 
+*******************
+## Présentation du projet
+Ce projet réalisé dans le cadre de notre cours d'arduino en PEIP2 à Polytech Nice-Sophia (prépa intégré) consiste à concevoir un robot aspirateur permettant de cartographier une pièce et de nettoyer ladite pièce de facon autonome. Nous allons pour cela utiliser une carte arduino Uno.
+
+## Séance du 14 Décembre 2023 (et tout travail en amont )
+- Création du projet sur Github
+- Mise en place du projet
+- Négociation avec le professeur pour obtenir le materiel (2 moteurs, 3 sonars, 1 blower fan de pc (moteur brushless), adaptateur carte sd arduino).
+- Création d'une maquette du projet avec le binôme ([photo ici](/Images/20231214_115155.heic)). Volume interieur: 30cm de diametre par 10cm de hauteur.
+- Disposition des composants déjà en notre possession dans la maquête: tout rentre, à voir quand il faudra mettre les brosses au milieu, et la carte arduino, et les batteries, et certainement plus...
+- Commande au professeur d'un [kit de maintenance iRobot](https://amzn.eu/d/cpejmey) pour obtenir un filtre, les brosses à rouleau et une brosse latérale.
+- Premier branchement à blanc de tout les composants sur une breadboard (voir photo ci-dessous).\
+Je voulais deja voir si une UNO avait assez de pin pour notre cas de figure, et on est déjà serré: coté digital i/o il me reste 4 pin PWM, où je comptais brancher les moteurs, sauf que j'ai besoin encore d'un pin PWM pour regler la vitesse du ventilo (ou a minima qu'il tourne). On est donc déjà en négatif, ce sera un probleme pour la semaine prochaine.\
+*Ne pas regarder les numéro des pin sur le brouillon, ils ont déjà été changés. Une version à jour est dans le fichier main.ino.*
+
+![uno+bread=♥](/images/20231214_124527.heic)
