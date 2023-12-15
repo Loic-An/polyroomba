@@ -1,5 +1,5 @@
 # Robot aspirateur
-## Description du projet: 
+## Description du projet
 L’idée est de développer un robot aspirateur ménager autonome capable d’aspirer la poussière et autres petits déchets. Le robot sera capable de modéliser la pièce dans laquelle il fait le ménage, et devra pouvoir couvrir toute la surface du sol de celle-ci. Le robot pourra s’arrêter s’il rencontre un obstacle, et de changer de direction pour l’éviter. Enfin, le robot devra avoir une contenance nécessaire pour stocker les déchets sur la durée d’un ménage (voir plusieurs). 
 ## Cahier des Charges Fonctionnel
 **Objectifs principaux à remplir**|**détails des tâches à remplir **|**contraintes techniques associées / solutions envisages**
