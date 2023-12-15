@@ -8,7 +8,7 @@ Ce projet réalisé dans le cadre de notre cours d'arduino en PEIP2 à Polytech 
 - Création du projet sur Github
 - Mise en place du projet
 - Négociation avec le professeur pour obtenir le materiel (2 moteurs, 3 sonars, 1 blower fan de pc (moteur brushless), adaptateur carte sd arduino).
-- Création d'une maquette du projet avec le binôme ([photo ici](/Images/20231214_115155.heic)). Volume interieur: 30cm de diametre par 10cm de hauteur.
+- Création d'une maquette du projet avec le binôme ([photo ici](/images/20231214_115155.heic)). Volume interieur: 30cm de diametre par 10cm de hauteur.
 - Disposition des composants déjà en notre possession dans la maquête: tout rentre, à voir quand il faudra mettre les brosses au milieu, et la carte arduino, et les batteries, et certainement plus...
 - Commande au professeur d'un [kit de maintenance iRobot](https://amzn.eu/d/cpejmey) pour obtenir un filtre, les brosses à rouleau et une brosse latérale.
 - Premier branchement à blanc de tout les composants sur une breadboard (voir photo ci-dessous).\
