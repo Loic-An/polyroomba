@@ -13,30 +13,36 @@ void set_fan_speed(uint16_t val)
 {
   OCR1A = (val > 320) ? 320 : val;
 }
-void sd_setup()
+
+void set_mot1_forward(bool dir)
 {
-  if (!sd.init())
-  {
-    Serial.println("sd card not initialized. Halting...");
-    while (1)
-    {
-    }
-  }
-  else
-  {
-    Serial.println("sd card initialized.");
-    isSdInit = true;
-  };
+  digitalWrite(PIN_MOT1_DIR1, !dir);
+  digitalWrite(PIN_MOT1_DIR2, dir);
+}
+
+void set_mot2_forward(bool dir)
+{
+  digitalWrite(PIN_MOT2_DIR1, dir);
+  digitalWrite(PIN_MOT2_DIR2, !dir);
 }
 
 void setup()
 {
-  Serial.begin(115200); // Initialize serial connection
-  Serial.println("Serial started.");
+  // Serial.begin(115200); // Initialize serial connection
+  // Serial.println("Serial started.");
 
-  sd_setup();
-  myLidarLite.begin(1, true);
-  Serial.println("Lidar started.");
+  // if (!sd.init())
+  // {
+  //   Serial.println("sd card not initialized. Halting...");
+  // }
+  // else
+  // {
+  //   Serial.println("sd card initialized.");
+  //   isSdInit = true;
+  // };
+
+  // myLidarLite.begin(1, true);
+  // Serial.println("Lidar started.");
 
   pinMode(PIN_SONAR_TRIG, OUTPUT);
   pinMode(PIN_MOT1_DIR1, OUTPUT);
@@ -56,17 +62,22 @@ void setup()
   TCCR1B |= (1 << WGM13) | (1 << CS10);   // Mode 10 (phase correcte), pas de pré-diviseur
   ICR1 = 320;                             // Valeur TOP pour une fréquence de 25kHz
   pinMode(PIN_FAN_PWM, OUTPUT);           // Mettre le pin 9 en sortie
-  set_fan_speed(320);
-  Serial.println("FAN PWM setup done.");
-  Serial.println("PINs setup done.");
+  set_fan_speed(0);
+  // Serial.println("FAN PWM setup done.");
 
-  digitalWrite(PIN_MOT1_DIR2, HIGH);
-  digitalWrite(PIN_MOT2_DIR2, HIGH);
+  // Serial.println("PINs setup done.");
 
-  Serial.println("SETUP DONE. ENTERING LOOP...");
+  set_mot1_forward(true);
+  set_mot2_forward(true);
+
+  digitalWrite(PIN_MOT1_EN, HIGH);
+  digitalWrite(PIN_MOT2_EN, HIGH);
+
+  // Serial.println("SETUP DONE. ENTERING LOOP...");
 }
 
 void loop()
 {
-  Serial.println(myLidarLite.distance());
+
+  // Serial.println(myLidarLite.distance());
 }
