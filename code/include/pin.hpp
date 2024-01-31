@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 // #define PIN_SD_MISO 13 pin par defaut, inutile de define
 // #define PIN_SD_SCK 12
 // #define PIN_SD_MOSI 11
