@@ -1,5 +1,4 @@
 #include "robot.hpp"
-#include <SD.h>
 
 Robot::Robot()
 {
@@ -9,7 +8,6 @@ Robot::Robot()
     log_d("Free heap: %d", ESP.getFreeHeap());
     log_d("Total PSRAM: %d", ESP.getPsramSize());
     log_d("Free PSRAM: %d", ESP.getFreePsram());
-    currentState = IDLE;
 }
 void Robot::setup()
 {
@@ -17,13 +15,23 @@ void Robot::setup()
     u8x8.setFont(u8x8_font_chroma48medium8_r);
     setupFan();
     setupSD();
+    setupGlobalPin();
+    setFanSpeed(0);
 }
-void Robot::changeState(RobotState newState) {}
+void Robot::changeState(RobotState newState)
+{
+    switch (currentState)
+    {
+    default:
+        break;
+    }
+    currentState = newState;
+}
 void Robot::loop()
 {
     u8x8.setCursor(0, 0);
     u8x8.print("Hello World!");
-    u8x8.print(currentState);
+    u8x8.print(StateMessage[currentState]);
     switch (currentState)
     {
     case (DISCOVERING):
@@ -34,6 +42,9 @@ void Robot::loop()
         return;
     case (CLEANING):
         clean();
+        return;
+    case (HOMING):
+        goHome();
         return;
     default:
         return;
@@ -48,10 +59,8 @@ void Robot::setupFan()
         .timer_num = LEDC_HS_TIMER,         // timer index
         .freq_hz = PWM_FREQUENCY,           // frequency of PWM signal
     };
-
     // Set configuration of timer0 for high speed channels
     ledc_timer_config(&ledc_timer);
-
     // Set LED Controller with previously prepared configuration
     ledc_channel_config_t ledc_channel = {
         .gpio_num = LEDC_HS_CH0_GPIO,
@@ -60,7 +69,6 @@ void Robot::setupFan()
         .timer_sel = LEDC_HS_TIMER,
         .duty = 0,
         .hpoint = 0};
-
     // Set the configuration
     ledc_channel_config(&ledc_channel);
 }
@@ -113,7 +121,9 @@ void Robot::setupSD()
 void Robot::discover()
 {
 }
-
+void Robot::spinAndPing()
+{
+}
 int Robot::ping()
 {
     return myLidar.distance();
