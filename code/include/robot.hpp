@@ -6,6 +6,9 @@
 #include "fan.hpp"
 #include <vector>
 #include <SD.h>
+#define BASE true
+
+typedef std::array<short, 2> coord_t;
 
 enum RobotState
 {
@@ -15,7 +18,6 @@ enum RobotState
     POSTDISCO,
     CLEANING,
 };
-const char *StateMessage[5] = {"IDLING", "GOING HOME", "DISCOVERING", "POSTPROCESSING", "CLEANING"};
 
 class Robot
 {
@@ -28,15 +30,18 @@ public:
     void goHome();
 
 private:
-    std::array<short, 2> coord = {0, 0};
-    double angle = 0;
-    std::vector<std::array<short, 2>> pointList;
+    coord_t coord = {0, 0};
+    double angle = 0.0F;
+    std::vector<coord_t> pointList;
     bool moving = false;
     U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8;
     LIDARLite myLidar;
+    static void setupInterrupts(Robot &instance);
+    void recoverOldState();
     void setupSD();
     void setupFan();
     void setupGlobalPin();
+    void setupScreen();
     void setFanSpeed(uint32_t);
     void discover();
     int ping();

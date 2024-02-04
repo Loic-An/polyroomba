@@ -1,8 +1,10 @@
 #include "robot.hpp"
 
+const char *RobotStateMessage[5] = {"IDLING", "GOING HOME", "DISCOVERING", "POSTPROCESSING", "CLEANING"};
+
 Robot::Robot()
 {
-    U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(U8X8_PIN_NONE);
+    U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(U8X8_PIN_NONE, SCL, SDA);
     LIDARLite myLidarLite;
     log_d("Total heap: %d", ESP.getHeapSize());
     log_d("Free heap: %d", ESP.getFreeHeap());
@@ -11,27 +13,40 @@ Robot::Robot()
 }
 void Robot::setup()
 {
-    u8x8.setFlipMode(0);
-    u8x8.setFont(u8x8_font_chroma48medium8_r);
+    setupScreen();
     setupFan();
     setupSD();
     setupGlobalPin();
     setFanSpeed(0);
+    setupInterrupts(*this);
+    log_d("Setup done");
+
+    u8x8.clear();
+    u8x8.setCursor(0, 0);
+    u8x8.print("Hello World!");
+    recoverOldState();
 }
 void Robot::changeState(RobotState newState)
 {
-    switch (currentState)
+    if (newState != currentState)
     {
-    default:
-        break;
+        switch (currentState)
+        {
+        default:
+            break;
+        }
+        currentState = newState;
     }
-    currentState = newState;
+    u8x8.clearLine(1);
+    u8x8.setCursor(0, 1);
+    u8x8.print(RobotStateMessage[newState]);
+}
+void Robot::recoverOldState()
+{
+    changeState(IDLING);
 }
 void Robot::loop()
 {
-    u8x8.setCursor(0, 0);
-    u8x8.print("Hello World!");
-    u8x8.print(StateMessage[currentState]);
     switch (currentState)
     {
     case (DISCOVERING):
@@ -74,22 +89,12 @@ void Robot::setupFan()
 }
 void Robot::setFanSpeed(uint32_t speed)
 {
-    ledc_set_duty_and_update(LEDC_HS_MODE, LEDC_HS_CH0_CHANNEL, speed, 0);
+    ledc_set_duty(LEDC_HS_MODE, LEDC_HS_CH0_CHANNEL, speed);
+    ledc_update_duty(LEDC_HS_MODE, LEDC_HS_CH0_CHANNEL);
 }
 void Robot::setupGlobalPin()
 {
-    pinMode(D0, OUTPUT);
-    pinMode(D1, OUTPUT);
-    pinMode(D2, OUTPUT);
-    pinMode(D3, OUTPUT);
-    pinMode(D4, OUTPUT);
-    pinMode(D5, OUTPUT);
-    digitalWrite(D1, LOW);
-    digitalWrite(D2, HIGH);
-    digitalWrite(D3, HIGH);
-    digitalWrite(D4, LOW);
-    analogWrite(D0, 40);
-    analogWrite(D5, 40);
+    pinMode(D1, INPUT_PULLUP);
 }
 void Robot::setupSD()
 {
@@ -118,6 +123,9 @@ void Robot::setupSD()
     }
     log_i("SD Card Size: %" PRIu64 " BYTES", SD.cardSize());
 }
+void Robot::goHome()
+{
+}
 void Robot::discover()
 {
 }
@@ -132,5 +140,20 @@ void Robot::clean()
 {
 }
 void Robot::compute()
+{
+}
+void Robot::setupScreen()
+{
+    if (!u8x8.begin())
+    {
+        log_e("Screen not available");
+        while (true)
+        {
+        };
+    };
+    u8x8.setFlipMode(0);
+    u8x8.setFont(u8x8_font_chroma48medium8_r);
+}
+void Robot::setupInterrupts(Robot &instance)
 {
 }
