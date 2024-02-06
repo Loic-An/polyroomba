@@ -6,6 +6,9 @@ Robot::Robot()
 {
     U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(U8X8_PIN_NONE, SCL, SDA);
     LIDARLite myLidarLite;
+    QuickPID motorG();
+    QuickPID motorD();
+
     log_d("Total heap: %d", ESP.getHeapSize());
     log_d("Free heap: %d", ESP.getFreeHeap());
     log_d("Total PSRAM: %d", ESP.getPsramSize());
@@ -20,7 +23,6 @@ void Robot::setup()
     setFanSpeed(0);
     setupInterrupts(*this);
     log_d("Setup done");
-
     u8x8.clear();
     u8x8.setCursor(0, 0);
     u8x8.print("Hello World!");
@@ -37,9 +39,9 @@ void Robot::changeState(RobotState newState)
         }
         currentState = newState;
     }
-    u8x8.clearLine(1);
+    // u8x8.clearLine(1);
     u8x8.setCursor(0, 1);
-    u8x8.print(RobotStateMessage[newState]);
+    u8x8.print(RobotStateMessage[currentState]);
 }
 void Robot::recoverOldState()
 {
@@ -101,13 +103,14 @@ void Robot::setupSD()
     if (!SD.begin(21))
     {
         log_e("Card Mount Failed");
+        return;
     }
     uint8_t cardType = SD.cardType();
     switch (cardType)
     {
     case (CARD_NONE):
         log_w("No SD Card attached");
-        break;
+        return;
     case (CARD_MMC):
         log_i("SD Card Type: MMC");
         break;
