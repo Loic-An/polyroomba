@@ -6,7 +6,6 @@
 #include "fan.hpp"
 #include <vector>
 #include <SD.h>
-#include <QuickPID.h>
 #define BASE true
 
 typedef std::array<short, 2> coord_t;
@@ -35,8 +34,6 @@ private:
     double angle = 0.0F;
     std::vector<coord_t> pointList;
     bool moving = false;
-    QuickPID motorG;
-    QuickPID motorD;
     U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8;
     LIDARLite myLidar;
     static void setupInterrupts(Robot &instance);

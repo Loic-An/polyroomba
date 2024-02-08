@@ -6,8 +6,6 @@ Robot::Robot()
 {
     U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(U8X8_PIN_NONE, SCL, SDA);
     LIDARLite myLidarLite;
-    QuickPID motorG();
-    QuickPID motorD();
 
     log_d("Total heap: %d", ESP.getHeapSize());
     log_d("Free heap: %d", ESP.getFreeHeap());
@@ -27,6 +25,13 @@ void Robot::setup()
     u8x8.setCursor(0, 0);
     u8x8.print("Hello World!");
     recoverOldState();
+    attachInterruptArg(
+        D1, [](void *arg)
+        {
+            Robot *robot = static_cast<Robot *>(arg);
+            robot->changeState(HOMING);
+            log_d("interrupt D1"); },
+        this, RISING);
 }
 void Robot::changeState(RobotState newState)
 {
