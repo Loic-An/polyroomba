@@ -8,10 +8,10 @@ void Motor::setup(double Set_point = 80, bool direction = true, bool pidmode = A
   pid.SetMode(pidmode);             // PID is set to automatic mode
   pid.SetSampleTime(pidsampletime); // Set PID sampling frequency is 100ms
   // Direction = true;                 // default -> Forward
-  pid.SetOutputLimits(0, 255 * Vratedmotor / Vin);
+  // pid.SetOutputLimits(0, 7);
   pinMode(encoderpinB, INPUT);
 
-  setSpeed(161); // setpoint =80 et dir=1
+  setSpeed(255); // setpoint =80 et dir=1
 }
 void Motor::loop()
 {
@@ -61,7 +61,7 @@ uint8_t Motor::getSpeed()
 {
   return ((int)val_output << 1) + Direction;
 }
-// Motor motor0(encoder0pinA, encoder0pinB, motor0dir, motor0EN);
+Motor motor0(encoder0pinA, encoder0pinB, motor0dir, motor0EN);
 Motor motor1(encoder1pinA, encoder1pinB, motor1dir, motor1EN);
 
 void receiveEvent(int nbBytes)
@@ -73,14 +73,14 @@ void receiveEvent(int nbBytes)
     {
       long incomingData = Wire.parseInt();
       uint16_t motorData = incomingData & 0xFFFF;
-      // motor0.setSpeed(motorData>>8);
+      motor0.setSpeed(motorData >> 8);
       motor1.setSpeed(motorData & 0xFF);
     }
   }
 }
 void requestEvent()
 {
-  Wire.write(motor1.getSpeed()); //+(motor0.getSpeed()<<8));
+  Wire.write(motor1.getSpeed() + (motor0.getSpeed() << 8));
 }
 
 void setup()
@@ -89,8 +89,12 @@ void setup()
   Wire.begin(0x42);
   Wire.onRequest(requestEvent); // Enregistrez l'événement
   Wire.onReceive(receiveEvent);
-  // motor0.setup();
-  // attachInterrupt(motor0.getApin(), []() { motor0.interrupt(); },CHANGE);
+  digitalWrite(11, HIGH);
+  motor0.setup();
+  attachInterrupt(
+      motor0.getApin(), []()
+      { motor0.interrupt(); },
+      CHANGE);
   motor1.setup();
   attachInterrupt(
       motor1.getApin(), []()
@@ -100,6 +104,6 @@ void setup()
 
 void loop()
 {
-  // motor0.loop();
+  motor0.loop();
   motor1.loop();
 }

@@ -3,12 +3,15 @@
 #include <U8x8lib.h>
 #include <LIDARLite.h>
 #include "pin.hpp"
-#include "fan.hpp"
 #include <vector>
 #include <SD.h>
+#include "coord.hpp"
+#define I2C_ADDR_UNO 0x42
+#define I2C_ADDR_SELF 0x52
+#define I2C_ADDR_LIDAR 0x62
+#define I2C_FREQ 400000U
 #define BASE true
 
-typedef std::array<short, 2> coord_t;
 
 enum RobotState
 {
@@ -36,13 +39,13 @@ private:
     bool moving = false;
     U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8;
     LIDARLite myLidar;
-    static void setupInterrupts(Robot &instance);
     void recoverOldState();
     void setupSD();
-    void setupFan();
+    void setMotorsSpeed(uint8_t, uint8_t);
+    void setupMotors();
+    void move(uint16_t distance);
     void setupGlobalPin();
     void setupScreen();
-    void setFanSpeed(uint32_t);
     void discover();
     int ping();
     void spinAndPing();

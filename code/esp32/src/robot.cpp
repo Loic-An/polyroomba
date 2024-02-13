@@ -14,42 +14,50 @@ Robot::Robot()
 }
 void Robot::setup()
 {
-    setupScreen();
-    setupFan();
     setupSD();
     setupGlobalPin();
-    setFanSpeed(0);
-    setupInterrupts(*this);
+
+    Wire.begin(I2C_ADDR_SELF);
+    Wire.setClock(I2C_FREQ);
+
+    setupMotors();
     log_d("Setup done");
+    /*
     u8x8.clear();
     u8x8.setCursor(0, 0);
-    u8x8.print("Hello World!");
+    u8x8.print("Hello World!");*/
     recoverOldState();
-    attachInterruptArg(
-        D1, [](void *arg)
-        {
-            Robot *robot = static_cast<Robot *>(arg);
-            robot->changeState(HOMING);
-            log_d("interrupt D1"); },
-        this, RISING);
 }
 void Robot::changeState(RobotState newState)
 {
     if (newState != currentState)
     {
-        switch (currentState)
+        if (newState == DISCOVERING && currentState == IDLING)
         {
-        default:
-            break;
+            if (BASE)
+            {
+                move(10);
+            }
         }
         currentState = newState;
     }
     // u8x8.clearLine(1);
-    u8x8.setCursor(0, 1);
-    u8x8.print(RobotStateMessage[currentState]);
+    // u8x8.setCursor(0, 1);
+    // u8x8.print(RobotStateMessage[currentState]);
+}
+// will travel distance centimeter, unless sensor detect obstacle
+void Robot::move(uint16_t distance)
+{
+    coord_t target = coord;
+    setMotorsSpeed(0b11000000, 0b11000000);
+    while ()
 }
 void Robot::recoverOldState()
 {
+    // TODO: stocker l'etat (sur une carte sd? sur la flash ?)
+    //  besoin de stocker la position et l'angle
+    //  besoin de stocker aussi en permanent les points ?
+    //
     changeState(IDLING);
 }
 void Robot::loop()
@@ -72,36 +80,32 @@ void Robot::loop()
         return;
     }
 }
-void Robot::setupFan()
-{
-    // Prepare and set configuration of timers that will be used by LED Controller
-    ledc_timer_config_t ledc_timer = {
-        .speed_mode = LEDC_HS_MODE,         // timer mode
-        .duty_resolution = DUTY_RESOLUTION, // resolution of PWM duty
-        .timer_num = LEDC_HS_TIMER,         // timer index
-        .freq_hz = PWM_FREQUENCY,           // frequency of PWM signal
-    };
-    // Set configuration of timer0 for high speed channels
-    ledc_timer_config(&ledc_timer);
-    // Set LED Controller with previously prepared configuration
-    ledc_channel_config_t ledc_channel = {
-        .gpio_num = LEDC_HS_CH0_GPIO,
-        .speed_mode = LEDC_HS_MODE,
-        .channel = LEDC_HS_CH0_CHANNEL,
-        .timer_sel = LEDC_HS_TIMER,
-        .duty = 0,
-        .hpoint = 0};
-    // Set the configuration
-    ledc_channel_config(&ledc_channel);
-}
-void Robot::setFanSpeed(uint32_t speed)
-{
-    ledc_set_duty(LEDC_HS_MODE, LEDC_HS_CH0_CHANNEL, speed);
-    ledc_update_duty(LEDC_HS_MODE, LEDC_HS_CH0_CHANNEL);
-}
 void Robot::setupGlobalPin()
 {
     pinMode(D1, INPUT_PULLUP);
+    attachInterruptArg(
+        D1, [](void *arg)
+        {
+            Robot *robot = static_cast<Robot *>(arg);
+            robot->changeState(HOMING);
+            log_d("interrupt D1"); },
+        this, RISING);
+}
+void Robot::setupMotors()
+{
+    Wire.beginTransmission(I2C_ADDR_UNO);
+    log_i("awaiting for write availability on %d...", I2C_ADDR_UNO);
+    while (!Wire.availableForWrite())
+    {
+        Wire.write(0b10000000000000000000000000000000L);
+    }
+
+    Wire.endTransmission();
+    setMotorsSpeed(0b11000000, 0b11000000);
+}
+void Robot::setMotorsSpeed(uint8_t newSpeed0, uint8_t newSpeed1)
+{
+    Wire.beginTransmission(I2C_ADDR_UNO);
 }
 void Robot::setupSD()
 {
@@ -161,7 +165,4 @@ void Robot::setupScreen()
     };
     u8x8.setFlipMode(0);
     u8x8.setFont(u8x8_font_chroma48medium8_r);
-}
-void Robot::setupInterrupts(Robot &instance)
-{
 }
