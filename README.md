@@ -5,7 +5,7 @@ roomba fait avec arduino
 
 ## Etat visuel actuel
 mis a jour régulièrement
-![photo du robot](/images/20231214_115155.heic)
+![photo du robot](/images/20240219_123823.heic)
 
 ## Authors
 
